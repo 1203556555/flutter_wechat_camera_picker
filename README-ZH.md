@@ -15,17 +15,28 @@ Language: [English](README.md) | 中文简体
 
 ## 目录 🗂
 
-* [特性](#特性-)
-* [截图](#截图-)
-* [准备工作](#准备工作-)
-* [使用方法](#使用方法-)
+- [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
+  - [目录 🗂](#目录-)
+  - [特性 ✨](#特性-)
+  - [截图 📸](#截图-)
+  - [准备工作 🍭](#准备工作-)
+  - [使用方法 📖](#使用方法-)
+    - [简单的使用方法](#简单的使用方法)
+  - [常见问题 💭](#常见问题-)
+    - [当 `shouldLockPortrait` 为 false 时为何有缩放问题？](#当-shouldLockPortrait-为-false-时为何有缩放问题-)
+
 
 ## 特性 ✨
 
-- [x] 💚 99%的微信风格
+- [x] 🔐 支持健全的空安全
+- [x] 💚 99% 的微信风格
 - [x] 📷 支持拍照
+  - [x] ☀️ 支持设置曝光参数
+  - [x] 🔍️ 支持捏合缩放
 - [x] 🎥 支持录像
   - [x] ⏱ 支持限制录像时间
+  - [x] 🔍 支持录像时缩放
+- [x] 🖾 支持自定义前景 widget 构建
 
 ## 截图 📸
 
@@ -37,34 +48,44 @@ Language: [English](README.md) | 中文简体
 
 ### 版本限制
 
-Flutter SDK：`>=1.20.0` 。
+Flutter SDK：`>=2.0.0` 。
 
-参考:
+### 配置
+
 - [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
 - [camera#installation](https://pub.dev/packages/camera#installation)
 
 ## 使用方法 📖
 
-| 参数名                       | 类型                           | 描述                                                             | 默认值                                 |
-| ---------------------------- | ------------------------------ | ---------------------------------------------------------------- | -------------------------------------- |
-| enableRecording              | `bool`                         | 选择器是否可以录像                                               | `false`                                |
-| onlyEnableRecording          | `bool`                         | 选择器是否仅可以录像。只在 `enableRecording`  为 `true` 时有效。 | `false`                                |
-| enableAudio                  | `bool`                         | 选择器是否需要录制音频。只于录像配合有效。                          | `true`                                |
-| enableSetExposure            | `bool`                         | 用户是否可以在界面上通过点击设定曝光点                             | `true`                                 |
-| enableExposureControlOnPoint | `bool`                         | 用户是否可以根据已经设置的曝光点调节曝光度                         | `true`                                 |
-| enablePinchToZoom            | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                               | `true`                                 |
-| enablePullToZoomInRecord     | `bool`                         | 用户是否可以在录制视频时上拉缩放                                 | `true`                                 |
-| shouldDeletePreviewFile      | `bool`                         | 返回页面时是否删除预览文件                                    | `false`                                |
-| maximumRecordingDuration     | `Duration`                     | 录制视频最长时长                                                 | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData`                    | 选择器的主题                                                     | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate                 | `CameraPickerTextDelegate`     | 控制部件中的文字实现                                             | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset             | `ResolutionPreset`             | 相机的分辨率预设                                                 | `ResolutionPreset.max`                 |
-| cameraQuarterTurns           | `int`                          | 摄像机视图顺时针旋转次数，每次90度                               | `0`                                    |
-| imageFormatGroup             | `ImageFormatGroup`             | 输出图像的格式描述                                        | `ImageFormatGroup.jpeg`                |
-| foregroundBuilder            | `Widget Function(CameraValue)` | 覆盖在相机预览上方的前景构建                                   | null                                   |
+| 参数名                       | 类型                            | 描述                                                             | 默认值                                 |
+| ---------------------------- | ------------------------------- | ---------------------------------------------------------------- | -------------------------------------- |
+| enableRecording              | `bool`                          | 选择器是否可以录像                                               | `false`                                |
+| onlyEnableRecording          | `bool`                          | 选择器是否仅可以录像。只在 `enableRecording`  为 `true` 时有效。 | `false`                                |
+| enableAudio                  | `bool`                          | 选择器是否需要录制音频。只于录像配合有效。                          | `true`                                |
+| enableSetExposure            | `bool`                          | 用户是否可以在界面上通过点击设定曝光点                             | `true`                                 |
+| enableExposureControlOnPoint | `bool`                          | 用户是否可以根据已经设置的曝光点调节曝光度                         | `true`                                 |
+| enablePinchToZoom            | `bool`                          | 用户是否可以在界面上双指缩放相机对焦                               | `true`                                 |
+| enablePullToZoomInRecord     | `bool`                          | 用户是否可以在录制视频时上拉缩放                                 | `true`                                 |
+| shouldDeletePreviewFile      | `bool`                          | 返回页面时是否删除预览文件                                    | `false`                                |
+| maximumRecordingDuration     | `Duration`                      | 录制视频最长时长                                                 | `const Duration(seconds: 15)`          |
+| theme                        | `ThemeData?`                    | 选择器的主题                                                     | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate                 | `CameraPickerTextDelegate?`     | 控制部件中的文字实现                                             | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset             | `ResolutionPreset`              | 相机的分辨率预设                                                 | `ResolutionPreset.max`                 |
+| cameraQuarterTurns           | `int`                           | 摄像机视图顺时针旋转次数，每次90度                               | `0`                                    |
+| imageFormatGroup             | `ImageFormatGroup`              | 输出图像的格式描述                                        | `ImageFormatGroup.unknown`             |
+| foregroundBuilder            | `Widget Function(CameraValue)?` | 覆盖在相机预览上方的前景构建                                   | null                                   |
+| onEntitySaving               | `SaveEntityCallback?`           | 在查看器中保存图片时的回调                                    | null                                   |
 
 ### 简单的使用方法
 
 ```dart
-final AssetEntity entity = await CameraPicker.pickFromCamera(context);
+final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 ```
+
+## 常见问题 💭
+
+### 当 `shouldLockPortrait` 为 false 时为何有缩放问题？
+
+当前旋转同步尚未支持。
+当用户在旋转设备时，来自 `CameraValue` 的 `DeviceOrientation` 与 Flutter 的不同。
+在两者匹配时，缩放问题会消失。
