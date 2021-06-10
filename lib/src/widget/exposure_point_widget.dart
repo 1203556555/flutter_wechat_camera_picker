@@ -2,20 +2,16 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2021-01-09 18:43
 ///
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import 'builder/tween_animation_builder_2.dart';
 
 class ExposurePointWidget extends StatelessWidget {
   const ExposurePointWidget({
-    Key key,
-    @required this.size,
-    @required this.color,
-  })  : assert(size != null),
-        assert(color != null),
-        super(key: key);
+    Key? key,
+    required this.size,
+    required this.color,
+  }) : super(key: key);
 
   final double size;
   final Color color;
@@ -47,108 +43,58 @@ class ExposurePointWidget extends StatelessWidget {
 /// 包含了四条弧及一个圆的曝光点绘制
 class ExposurePointPainter extends CustomPainter {
   const ExposurePointPainter({
-    @required this.size,
-    @required this.color,
+    required this.size,
+    required this.color,
     this.radius = 2,
     this.strokeWidth = 2,
-  })  : assert(size != null),
-        assert(size > 0),
-        assert(color != null);
+  }) : assert(size > 0);
 
   final double size;
   final double radius;
   final double strokeWidth;
   final Color color;
 
+  Radius get _circularRadius => Radius.circular(radius);
+
   @override
   void paint(Canvas canvas, Size size) {
     final Size _dividedSize = size / 3;
+    final double _lineLength = _dividedSize.width - radius;
     final Paint _paint = Paint()
       ..style = PaintingStyle.stroke
       ..color = color
       ..strokeWidth = strokeWidth;
 
+    final Path path = Path()
+      // 先移动到左上组弧的顺时针起始位
+      ..moveTo(0, _dividedSize.height)
+      // 左上组弧
+      ..relativeLineTo(0, -_lineLength)
+      ..relativeArcToPoint(Offset(radius, -radius), radius: _circularRadius)
+      ..relativeLineTo(_lineLength, 0)
+      // 移动至右上组弧起始位
+      ..relativeMoveTo(_dividedSize.width, 0)
+      // 右上组弧
+      ..relativeLineTo(_lineLength, 0)
+      ..relativeArcToPoint(Offset(radius, radius), radius: _circularRadius)
+      ..relativeLineTo(0, _lineLength)
+      // 移动至右下组弧起始位
+      ..relativeMoveTo(0, _dividedSize.height)
+      // 右下组弧
+      ..relativeLineTo(0, _lineLength)
+      ..relativeArcToPoint(Offset(-radius, radius), radius: _circularRadius)
+      ..relativeLineTo(-_lineLength, 0)
+      // 移动至左下组弧起始位
+      ..relativeMoveTo(-_dividedSize.width, 0)
+      // 左下组弧
+      ..relativeLineTo(-_lineLength, 0)
+      ..relativeArcToPoint(Offset(-radius, -radius), radius: _circularRadius)
+      ..relativeLineTo(0, -_lineLength)
+      // 移动至左上组弧起始位
+      ..relativeMoveTo(0, -_dividedSize.height)
+      ..close();
     canvas
-      // 左上角组弧
-      ..drawLine(Offset(radius, 0), Offset(_dividedSize.width, 0), _paint)
-      ..drawArc(
-        Rect.fromCenter(
-          center: Offset(radius, radius),
-          width: radius * 2,
-          height: radius * 2,
-        ),
-        -math.pi,
-        math.pi / 2,
-        false,
-        _paint,
-      )
-      ..drawLine(Offset(0, _dividedSize.height), Offset(0, radius), _paint)
-      // 右上角组弧
-      ..drawLine(
-        Offset(_dividedSize.width * 2, 0),
-        Offset(size.width - radius, 0),
-        _paint,
-      )
-      ..drawArc(
-        Rect.fromCenter(
-          center: Offset(size.width - radius, radius),
-          width: radius * 2,
-          height: radius * 2,
-        ),
-        -math.pi / 2,
-        math.pi / 2,
-        false,
-        _paint,
-      )
-      ..drawLine(
-        Offset(size.width, radius),
-        Offset(size.width, _dividedSize.height),
-        _paint,
-      )
-      // 右下角组弧
-      ..drawLine(
-        Offset(size.width, _dividedSize.height * 2),
-        Offset(size.width, size.height - radius),
-        _paint,
-      )
-      ..drawArc(
-        Rect.fromCenter(
-          center: Offset(size.width - radius, size.height - radius),
-          width: radius * 2,
-          height: radius * 2,
-        ),
-        0,
-        math.pi / 2,
-        false,
-        _paint,
-      )
-      ..drawLine(
-        Offset(size.height - radius, size.height),
-        Offset(size.height - _dividedSize.width, size.height),
-        _paint,
-      )
-      // 左下角组弧
-      ..drawLine(
-        Offset(_dividedSize.width, size.height),
-        Offset(radius, size.height),
-        _paint,
-      )
-      ..drawArc(
-        Rect.fromCenter(
-          center: Offset(radius, size.height - radius),
-          width: radius * 2,
-          height: radius * 2,
-        ),
-        math.pi / 2,
-        math.pi / 2,
-        false,
-        _paint,
-      )
-      ..drawLine(
-        Offset(0, size.height - radius),
-        Offset(0, size.height - _dividedSize.height),
-        _paint,
-      )
+      ..drawPath(path, _paint)
       // 中心圆
       ..drawCircle(
         Offset(size.width / 2, size.height / 2),
