@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:video_player/video_player.dart';
 
 import '../constants/constants.dart';
@@ -219,28 +220,19 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
           );
           break;
         case CameraPickerViewType.video:
-          saveFuture = PhotoManager.editor.saveVideo(
-            previewFile,
-            title: previewFile.path,
-          );
+          // saveFuture = PhotoManager.editor.saveVideo(
+          //   previewFile,
+          //   title: previewFile.path,
+          // );
+          saveFuture = Future<AssetEntity>.sync(() => AssetEntity(id: previewFile.path));
           break;
       }
 
       saveFuture.then((AssetEntity entity) async{
-        //jy
-        //部分机型保存到相册失败，返回null
-        AssetEntity newEntity;
-        if(entity == null) {
-          newEntity = await AssetEntity.fromId(previewFile.path);
-        }
-        else {
-          newEntity = entity;
-        }
-
         if (shouldDeletePreviewFile && previewFile.existsSync()) {
           previewFile.delete();
         }
-        Navigator.of(context).pop(newEntity);
+        Navigator.of(context).pop(entity);
       });
     } catch (e) {
       realDebugPrint('Error when creating entity: $e');
