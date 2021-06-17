@@ -739,6 +739,10 @@ class CameraPickerState extends State<CameraPicker>
         isShootingButtonAnimate = false;
       });
     }
+
+    Future.delayed(Duration(milliseconds: 500), (){
+      initCameras(currentCamera);
+    });
   }
 
   /// Set record file path and start recording.
