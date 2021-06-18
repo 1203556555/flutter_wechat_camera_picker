@@ -43,6 +43,7 @@ class CameraPicker extends StatefulWidget {
     this.imageFormatGroup = ImageFormatGroup.jpeg,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
+    this.switchFrontCamera,
     CameraPickerTextDelegate textDelegate,
   })  : assert(enableRecording != null),
         assert(onlyEnableRecording != null),
@@ -69,6 +70,9 @@ class CameraPicker extends StatefulWidget {
             ? DefaultCameraPickerTextDelegateWithRecording()
             : DefaultCameraPickerTextDelegate());
   }
+
+  /// 是否默认使用前置摄像头
+  final bool switchFrontCamera;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
   /// 摄像机视图顺时针旋转次数，每次90度
@@ -136,6 +140,7 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
+    bool switchFrontCamera = false,
     bool enableRecording = false,
     bool onlyEnableRecording = false,
     bool enableAudio = true,
@@ -177,6 +182,7 @@ class CameraPicker extends StatefulWidget {
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
           foregroundBuilder: foregroundBuilder,
+          switchFrontCamera: switchFrontCamera,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: _kRouteDuration,
@@ -483,9 +489,14 @@ class CameraPickerState extends State<CameraPicker>
         return;
       }
 
+      //处理默认前置摄像头
+      if (cameraDescription == null && widget.switchFrontCamera && cameras.length >= 2) {
+        currentCameraIndex = 1;
+      }
+
       // Initialize the controller with the given resolution preset.
       _controllerNotifier.value = CameraController(
-        cameraDescription ?? cameras[0],
+        cameraDescription ?? (widget.switchFrontCamera && cameras.length >= 2 ? cameras[1] : cameras[0]),
         widget.resolutionPreset,
         enableAudio: enableAudio,
         imageFormatGroup: widget.imageFormatGroup,
